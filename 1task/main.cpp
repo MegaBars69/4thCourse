@@ -9,7 +9,7 @@
 
 double p (double x) 
 {
-    double Cp = 10;
+    double Cp = 1;
     return Cp * x;
 }
 
@@ -17,7 +17,7 @@ double p (double x)
 int main(int argc, char* argv[])
 {
     //feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW);
-    double T, X, mui = 0.01;
+    double T, X, mui = 0.1;
     int N, M;
     if (!init_args (argc, argv, T, X, N, M)) return 1;
 
@@ -29,12 +29,22 @@ int main(int argc, char* argv[])
     double* H = new double [M + 1];
 
     InitF (f, f0, tau, h, N, M);
+
+    /*for (int t = 0; t <= N; t++)
+    {
+        for (int x = 0; x <= M; x++)
+        {
+            std::cout<<f[t * (M + 1) + x]<<" ";
+        }
+        printf ("\n");
+    }*/
+    
     SolveScheme (f, f0,  mui, T, X, N, M, p, V, H);
 
     double norm = 0;
     for (int i = 0; i <= M; i++)
     {
-        norm = (fabs (V[i] - U (T - tau, i * h)) > norm ? fabs (V[i] - U (T - tau, i * h)) : norm);
+        norm = (fabs (V[i] - U (T, i * h)) > norm ? fabs (V[i] - U (T, i * h)) : norm);
     }
     std::cout<<norm<<std::endl;
 

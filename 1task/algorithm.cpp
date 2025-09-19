@@ -2,6 +2,7 @@
 #include "initialize_matrix.hpp"
 #include "progonka_solver.hpp"
 #include "log.hpp"
+#include "test.hpp"
 #include <iostream>
 #include <cmath>
 #include <string.h>
@@ -16,8 +17,6 @@ double FindLambda (double* H, double mui, int M)
     return mui/min;
 }
 
-double p0 (double x) {return (x < 4.5 || x > 5.5 ? 1 : 2);}
-
 void SolveScheme (double* f, double *f0, double mui, double T, double X, int N, int M, Function p, double* V, double* H)
 {
     double tau = T / N, h = X / M, lambda = 0;
@@ -28,8 +27,8 @@ void SolveScheme (double* f, double *f0, double mui, double T, double X, int N, 
 
     for (int i = 0; i <= M; ++i) 
     {
-        V[i] = sin (4 * M_PI * (i*h));
-        H[i] = cos (3 * M_PI * (i*h)) + 1.5;
+        V[i] = U (0 , i*h);
+        H[i] = po (0, i*h);
         upV[i] = 0;
     }
     V[0] = V[M] = 0; upV[0] = upV[M] = 0;
@@ -60,7 +59,8 @@ void SolveScheme (double* f, double *f0, double mui, double T, double X, int N, 
             return;
         }
 
-        memcpy (V, upV, (M + 1) * sizeof(double));
+        for (int i = 0; i <= M; i++)
+            V[i] = upV[i];
     }
     printf ("PRINTING V:\n");
     PrintVector (V, M + 1);

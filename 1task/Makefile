@@ -1,8 +1,8 @@
 CC=g++
-CFLAGS= -O3 -mfpmath=sse -fstack-protector-all -g -W -Wall -Wextra -Wcast-align -pedantic -pedantic-errors -Wfloat-equal -Wpointer-arith -Wformat-security -Wmissing-format-attribute -Wformat=1 -Wwrite-strings -Wcast-align -Wno-long-long -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-qual -ffast-math -Wno-suggest-attribute=format
+CFLAGS= -O0 -mfpmath=sse -fstack-protector-all -g -W -Wall -Wextra -Wcast-align -pedantic -pedantic-errors -Wfloat-equal -Wpointer-arith -Wformat-security -Wmissing-format-attribute -Wformat=1 -Wwrite-strings -Wcast-align -Wno-long-long -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-qual -ffast-math -Wno-suggest-attribute=format
 
-a.out: main.o initialize_matrix.o progonka_solver.o log.o test.o algorithm.o
-	$(CC) -g main.o initialize_matrix.o progonka_solver.o log.o test.o algorithm.o -o a.out
+a.out: main.o initialize_matrix.o progonka_solver.o log.o test.o norms.o algorithm.o
+	$(CC) -g main.o initialize_matrix.o progonka_solver.o log.o test.o norms.o algorithm.o -o a.out
 
 main.o : main.cpp
 	$(CC) $(CFLAGS) -c main.cpp -o main.o 
@@ -18,6 +18,9 @@ log.o : log.cpp
 
 test.o : test.cpp
 	$(CC) $(CFLAGS) -c test.cpp -o test.o
+
+norms.o : norms.cpp
+	$(CC) $(CFLAGS) -c norms.cpp -o norms.o
 
 algorithm.o : algorithm.cpp
 	$(CC) $(CFLAGS) -c algorithm.cpp -o algorithm.o

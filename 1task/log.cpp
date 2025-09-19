@@ -1,7 +1,7 @@
 #include <iostream>
 #include "log.hpp"
 
-void PrintMatrix (double *A, int n)
+void PrintTriDiagMatrix (double *A, int n)
 {
     std::cout<<"a: ";
     for (int i = 1; i < n; i++)
@@ -23,6 +23,18 @@ void PrintMatrix (double *A, int n)
         std::cout<<A[i]<<" ";
     }
     printf ("\n");
+}
+
+void PrintMatrix (double* A, int N, int M)
+{
+    for (int i = 0; i <= N; i++)
+    {
+        for (int j = 0; j <= M; j++)
+        {
+            std::cout<<A[i * (M + 1) + j]<<" ";
+        }
+        printf ("\n");
+    }
 }
 
 void PrintVector (double* x, int n)

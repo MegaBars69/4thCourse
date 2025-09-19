@@ -27,7 +27,7 @@ void SolveScheme (double* f, double *f0, double mui, double T, double X, int N, 
 
     for (int i = 0; i <= M; ++i) 
     {
-        V[i] = U (0 , i*h);
+        V[i] = U (0, i*h);
         H[i] = po (0, i*h);
         upV[i] = 0;
     }
@@ -49,7 +49,7 @@ void SolveScheme (double* f, double *f0, double mui, double T, double X, int N, 
             return;
         }
 
-        InitH (A, b, V, upV, H, f0, tau, h, mui, lambda, M, n);
+        InitH (A, b, V, upV, H, f0, tau, h, M, n);
         if (!SolveSystem (A, b, H, M + 1))
         {
             printf ("Something went wrong!\n");
@@ -62,10 +62,10 @@ void SolveScheme (double* f, double *f0, double mui, double T, double X, int N, 
         for (int i = 0; i <= M; i++)
             V[i] = upV[i];
     }
-    printf ("PRINTING V:\n");
+    /*printf ("PRINTING V:\n");
     PrintVector (V, M + 1);
     printf ("PRINTING H:\n");
-    PrintVector (H, M + 1);
+    PrintVector (H, M + 1);*/
 
     delete[] upV; 
     delete[] A; 

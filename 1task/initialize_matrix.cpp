@@ -15,7 +15,7 @@ void InitV (double* A, double* B, double* V, double* H, double* f, double tau, d
     }    
 }
 
-void InitH (double* A, double* B, double* V, double* upV, double* H, double* f0, double tau, double h, double mui, double lambda, int M, int n)
+void InitH (double* A, double* B, double* V, double* upV, double* H, double* f0, double tau, double h, int M, int n)
 {
     double *a = A, *b = A + M + 1, *c = A + 2*(M + 1), *d = B;
     double th = tau/h;

@@ -2,7 +2,8 @@
 #include <iostream>
 #include <cmath>
 
-double Cp =  1, mui = 0.1;
+double Cp = 1;
+double mui = 0.1;
 
 double U (double t, double x) {return cos (2 * M_PI * t) * sin (4 * M_PI * x);}
 

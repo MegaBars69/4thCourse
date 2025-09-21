@@ -29,12 +29,12 @@ int main(int argc, char* argv[])
     double* H = new double [M + 1];
     double* u = new double [M + 1]; 
     double* rho = new double [M + 1];
-    double* NullMatrix = new double [M + 1]; 
+    double* NullVector = new double [M + 1]; 
     for (int i = 0; i <= M; i++)
     {
         u[i] = U(T, i*h);
         rho[i] = po(T, i*h);
-        NullMatrix[i] = 0;
+        NullVector[i] = 0;
     }
     InitF (f, f0, tau, h, N, M);
  
@@ -47,18 +47,17 @@ int main(int argc, char* argv[])
     double w_norm = W_norm(V, u, M, h);
     double l_norm = L_norm(V, u, M, h);
     double c_norm = C_norm(V, u, M);
-    double V_w_norm = W_norm(V, NullMatrix, M, h);
-    double V_l_norm = L_norm(V, NullMatrix, M, h);
-    double V_c_norm = C_norm(V, NullMatrix, M);
-
+    double V_w_norm = W_norm(V, NullVector, M, h);
+    double V_l_norm = L_norm(V, NullVector, M, h);
+    double V_c_norm = C_norm(V, NullVector, M);
+    double H_w_norm = W_norm(H, NullVector, M, h);
+    double H_l_norm = L_norm(H, NullVector, M, h);
+    double H_c_norm = C_norm(H, NullVector, M);
     printf ("ResV1 = %e ResV2 = %e ResV3 = %e T = %.2f \n", c_norm / V_c_norm, l_norm / V_l_norm, w_norm / V_w_norm, t);
 
     w_norm = W_norm(H, rho, M, h);
     l_norm = L_norm(H, rho, M, h);
     c_norm = C_norm(H, rho, M);
-    double H_w_norm = W_norm(H, NullMatrix, M, h);
-    double H_l_norm = L_norm(H, NullMatrix, M, h);
-    double H_c_norm = C_norm(H, NullMatrix, M);
 
     printf ("ResH1 = %e ResH2 = %e ResH3 = %e T = %.2f \n", c_norm / H_c_norm, l_norm / H_l_norm, w_norm / H_w_norm, t);
 
@@ -68,7 +67,7 @@ int main(int argc, char* argv[])
     delete[] H;
     delete[] u;
     delete[] rho;
-    delete[] NullMatrix;
+    delete[] NullVector;
 
     return 0;
 }

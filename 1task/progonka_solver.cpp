@@ -15,7 +15,6 @@ bool SolveSystem (double* A, double* B, double* x, int n)
     double* betha = b;
     if (fabs (denomenator) < EPSILON)
         return false;
-    
     alpha[0] = -c[0] / denomenator;
     betha[0] = d[0] / denomenator;
 

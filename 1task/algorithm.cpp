@@ -3,6 +3,7 @@
 #include "progonka_solver.hpp"
 #include "log.hpp"
 #include "test.hpp"
+#include "norms.hpp"
 #include <iostream>
 #include <cmath>
 #include <string.h>
@@ -59,8 +60,7 @@ void SolveScheme (double* f, double *f0, double mui, double T, double X, int N, 
             return;
         }
 
-        for (int i = 0; i <= M; i++)
-            V[i] = upV[i];
+        memcpy (V, upV, (M + 1) * sizeof (double));
     }
     /*printf ("PRINTING V:\n");
     PrintVector (V, M + 1);

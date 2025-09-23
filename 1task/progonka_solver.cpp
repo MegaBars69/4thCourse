@@ -13,16 +13,15 @@ bool SolveSystem (double* A, double* B, double* x, int n)
     double denomenator = b[0];
     double* alpha = c;
     double* betha = b;
-    if (fabs (denomenator) < EPSILON)
-        return false;
+    if (fabs (denomenator) < EPSILON) { return false; }
+
     alpha[0] = -c[0] / denomenator;
     betha[0] = d[0] / denomenator;
 
     for (int i = 1; i < n; i++)
     {
         denomenator = b[i] + a[i]*alpha[i-1];
-        if (fabs (denomenator) < EPSILON)
-            return false;
+        if (fabs (denomenator) < EPSILON) { return false; }
         alpha[i] = -c[i]/denomenator;
         betha[i] = (d[i]-a[i]*betha[i-1])/denomenator;
     }

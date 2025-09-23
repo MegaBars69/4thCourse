@@ -16,13 +16,12 @@ double p (double x)
 
 int main(int argc, char* argv[])
 {
-    //feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW);
+    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW);
     double T, X;
     int N, M;
     if (!init_args (argc, argv, T, X, N, M)) return 1;
 
     double h = X / M;
-    double tau = T / N;
     double *f = new double[(N + 1) * (M + 1)];
     double *f0 = new double[(N + 1) * (M + 1)];
     double* V = new double [M + 1];
@@ -36,10 +35,9 @@ int main(int argc, char* argv[])
         rho[i] = po(T, i*h);
         NullVector[i] = 0;
     }
-    InitF (f, f0, tau, h, N, M);
- 
+
     auto start = clock();
-    SolveScheme (f, f0,  mui, T, X, N, M, p, V, H);
+    SolveScheme (func_f, func_f0,  mui, T, X, N, M, p, V, H);
     auto end = clock ();
 
     auto t = static_cast<double> (end - start) / CLOCKS_PER_SEC;

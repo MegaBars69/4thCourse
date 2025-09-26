@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
     double* NullVector = new double [M + 1]; 
     for (int i = 0; i <= M; i++)
     {
-        u[i] = U(T, i*h);
+        u[i] = U(T , i*h);
         rho[i] = po(T, i*h);
         NullVector[i] = 0;
     }

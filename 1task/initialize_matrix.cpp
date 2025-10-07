@@ -2,7 +2,7 @@
 #include "test.hpp"
 #include <iostream>
 
-void InitV (double* A, double* B, double* V, double* H,  double tau, double h, double mui, double lambda, int M, double X_a, double /*X_b*/, double t, Function p)
+void InitV (double* A, double* B, double* V, double* H,  double tau, double h, double mui, double lambda, int M, double X_a, double /*X_b*/, double t)
 {
     double *a = A, *b = A + M - 1, *c = A + 2 * (M - 1), *d = B;
     double th = tau/h;

@@ -8,12 +8,6 @@
 #include <cmath>
 #include <fenv.h>
 
-double p (double x) 
-{
-    return Cp * x;
-}
-
-
 int main(int argc, char* argv[])
 {
     //feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW);
@@ -37,7 +31,7 @@ int main(int argc, char* argv[])
     }
 
     auto start = clock();
-    SolveScheme (mui, T_a, T_b, X_a, X_b, N, M, p, V, H);
+    SolveScheme (mui, T_a, T_b, X_a, X_b, N, M, V, H);
     auto end = clock ();
 
     auto t = static_cast<double> (end - start) / CLOCKS_PER_SEC;
@@ -48,16 +42,11 @@ int main(int argc, char* argv[])
     double V_w_norm = W_norm(V, NullVector, M, h);
     double V_l_norm = L_norm(V, NullVector, M, h);
     double V_c_norm = C_norm(V, NullVector, M);
-    double H_w_norm = W_norm(H, NullVector, M, h);
-    double H_l_norm = L_norm(H, NullVector, M, h);
-    double H_c_norm = C_norm(H, NullVector, M);
     printf ("ResV1 = %e ResV2 = %e ResV3 = %e T = %.2f \n", c_norm / V_c_norm, l_norm / V_l_norm, w_norm / V_w_norm, t);
 
     w_norm = W_norm(H, rho, M, h);
     l_norm = L_norm(H, rho, M, h);
     c_norm = C_norm(H, rho, M);
-
-    printf ("ResH1 = %e ResH2 = %e ResH3 = %e T = %.2f \n", c_norm / H_c_norm, l_norm / H_l_norm, w_norm / H_w_norm, t);
 
     delete[] f;
     delete[] f0;

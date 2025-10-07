@@ -1,7 +1,7 @@
 CC=g++
-CFLAGS= -O3 -mfpmath=sse -fstack-protector-all -g -W -Wall -Wextra -Wcast-align -pedantic -pedantic-errors -Wfloat-equal -Wpointer-arith -Wformat-security -Wmissing-format-attribute -Wformat=1 -Wwrite-strings -Wcast-align -Wno-long-long -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-qual -ffast-math -Wno-suggest-attribute=format 
-a.out: main.o initialize_matrix.o progonka_solver.o log.o test.o norms.o algorithm.o
-	$(CC) -g main.o initialize_matrix.o progonka_solver.o log.o test.o norms.o algorithm.o -o a.out
+CFLAGS= -O3 -mfpmath=sse -fstack-protector-all -g -W -Wall -Wextra -Wcast-align -pedantic -pedantic-errors -Wfloat-equal -Wpointer-arith -Wformat-security -Wmissing-format-attribute -Wformat=1 -Wwrite-strings -Wcast-align -Wno-long-long -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-qual -Wno-suggest-attribute=format 
+a.out: main.o initialize_matrix.o progonka_solver.o log.o test.o norms.o algorithm.o table_printer.o
+	$(CC) -g main.o initialize_matrix.o progonka_solver.o log.o test.o norms.o algorithm.o table_printer.o -o a.out
 
 main.o : main.cpp
 	$(CC) $(CFLAGS) -c main.cpp -o main.o 
@@ -23,6 +23,9 @@ norms.o : norms.cpp
 
 algorithm.o : algorithm.cpp
 	$(CC) $(CFLAGS) -c algorithm.cpp -o algorithm.o
+
+table_printer.o : table_printer.cpp
+	$(CC) $(CFLAGS) -c table_printer.cpp -o table_printer.o
 
 clean:
 	rm -f *.o a.out

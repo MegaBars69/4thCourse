@@ -5,6 +5,7 @@
 
 extern double Cp;
 extern double mui;
+extern bool liniar;  // Add this line
 
 void InitF (double* f, double* f0, double tau, double h, int N, int M);
 void Test_Scheme (int N, int M);
@@ -23,4 +24,6 @@ inline double V_0 (double x)
     return std::sin (4. * M_PI * x);
 }
 
-#endif 
+double p (double x);
+
+#endif

@@ -18,7 +18,7 @@ double FindLambda (double* H, double mui, int M)
     return mui/min;
 }
 
-void SolveScheme (double mui, double T_a, double T_b, double X_a, double X_b, int N, int M, Function p, double* V, double* H)
+void SolveScheme (double mui, double T_a, double T_b, double X_a, double X_b, int N, int M, double* V, double* H)
 {
     double tau = (T_b - T_a) / N, h = (X_b - X_a) / M, lambda = 0;
     double t = T_a;
@@ -47,7 +47,7 @@ void SolveScheme (double mui, double T_a, double T_b, double X_a, double X_b, in
         t = (n != N ? T_a + n * tau : T_b);
         lambda = FindLambda (H, mui, M);
 
-        InitV (A, b, V, H, tau, h, mui, lambda, M, X_a, X_b, t, p);
+        InitV (A, b, V, H, tau, h, mui, lambda, M, X_a, X_b, t);
         if (!SolveSystem (A, b, upV + 1, M - 1)) something_went_wrong (n);
         
         InitH (A, b, V, upV, H, tau, h, M, X_a, X_b, t);

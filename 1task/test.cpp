@@ -2,8 +2,12 @@
 #include <iostream>
 #include <cmath>
 
-double Cp = 1;
-double mui = 0.1;
+double Cp = 10;
+double Gamma = 1.4;
+double mui = 0.01;
+bool liniar = true;
+
+double p (double x) { return (liniar ? Cp * x : pow (x, Gamma)); }
 
 double U (double t, double x) {return cos (2 * M_PI * t) * sin (4 * M_PI * x);}
 
@@ -24,31 +28,9 @@ double func_f (double t, double x)
     double p = po (t, x);
     double ut = -2 * M_PI * sin (2 * M_PI * t) * sin (4 * M_PI * x);
     double ux =  4 * M_PI * cos (4 * M_PI * x) * cos (2 * M_PI * t);
-    double uxx = -(16 * M_PI * M_PI) * u ;
+    double uxx = -(16 * M_PI * M_PI) * u;
     double Pxp = -3 * M_PI * sin (3 * M_PI * x) / (1.5 + cos (3 * M_PI * x));
-    return ut + u * ux + Cp * Pxp - mui * uxx / p;
-}
 
-/*
-double func_f0 (double t, double x)
-{
-    double u = U (t, x);
-    double ux =  2*x - 1;
-    double px = 0;
-    double pt = 0;
-    double p = po (t,x);
-    return p * ux + pt + u * px;
+    if (liniar) { return ut + u * ux + Cp * Pxp - mui * uxx / p; }
+    else { return ut + u * ux + Gamma * Pxp * pow (p, 0.4) - mui * uxx / p; } 
 }
-
-double func_f (double t, double x)
-{
-    double u = U(t,x);
-    double f0 = func_f0 (t, x);
-    double p = po (t, x);
-    double ut = 0;
-    double ux = 2*x - 1;
-    double uxx = 2;
-    double Pxp = 0;
-    return ut + u * ux + Cp * Pxp - mui * uxx / p;
-}
-*/

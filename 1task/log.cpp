@@ -46,27 +46,22 @@ void PrintVector (double* x, int n)
     printf ("\n");
 }
 
-bool init_args(int argc, char* argv[], double &T, double &X, int &N, int &M)
+bool init_args(int argc, char* argv[], int &N, int &M)
 {
-    if (argc != 5)
+    if (argc != 3)
     {
-        printf("Usage: ./a.out T X N M\n");
+        printf("Usage: ./a.out N M\n");
         printf("Where:\n");
-        printf("  T - maximum time value\n");
-        printf("  X - maximum spatial coordinate value\n");
         printf("  N - number of time steps\n");
         printf("  M - number of spatial steps\n");
         return false;
     }
     
     try {
-        T = std::stod(argv[1]);
-        X = std::stod(argv[2]);
-        N = std::stoi(argv[3]);
-        M = std::stoi(argv[4]);
+        N = std::stoi(argv[1]);
+        M = std::stoi(argv[2]);
         
-        // Validate input values
-        if (T <= 0 || X <= 0 || N <= 0 || M <= 0) {
+        if (N <= 0 || M <= 0) {
             printf("Error: All parameters must be positive values\n");
             return false;
         }

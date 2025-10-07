@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cmath>
 
-double Cp = 10;
+double Cp = 1;
 double mui = 0.1;
 
 double U (double t, double x) {return cos (2 * M_PI * t) * sin (4 * M_PI * x);}
@@ -28,11 +28,8 @@ double func_f (double t, double x)
     double Pxp = -3 * M_PI * sin (3 * M_PI * x) / (1.5 + cos (3 * M_PI * x));
     return ut + u * ux + Cp * Pxp - mui * uxx / p;
 }
+
 /*
-double U (double t, double x) {return x * x - x;}
-
-double po (double t, double x) {return 10;}
-
 double func_f0 (double t, double x)
 {
     double u = U (t, x);

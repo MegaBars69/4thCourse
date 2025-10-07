@@ -18,68 +18,42 @@ double FindLambda (double* H, double mui, int M)
     return mui/min;
 }
 
-void SolveScheme (Function2d f, Function2d f0, double mui, double T, double X, int N, int M, Function p, double* V, double* H)
+void SolveScheme (double mui, double T_a, double T_b, double X_a, double X_b, int N, int M, Function p, double* V, double* H)
 {
-    double tau = T / N, h = X / M, lambda = 0;
+    double tau = (T_b - T_a) / N, h = (X_b - X_a) / M, lambda = 0;
+    double t = T_a;
 
     double* upV = new double [M + 1];
     double* A = new double [3 * (M + 1)];
-    double* b = new double [M + 1];
-    double* u = new double [M + 1]; 
-    double* rho = new double [M + 1];
-    double* NullVector = new double [M + 1]; 
+    double* b = new double [M + 1];    
+   
     for (int i = 0; i <= M; i++) 
     {
-        V[i] = U (0, i*h);
-        H[i] = po (0, i*h);
+        V[i] = V_0 (X_a + i*h);
+        H[i] = H_0 (X_a + i*h);
         upV[i] = 0;
     }
     
-    auto something_went_wrong = [&]() 
+    auto something_went_wrong = [&](int n) 
     {
-        printf("Something went wrong!\n");
+        std::cout<<"Something went wrong!\n"<<"Step:"<<n<<std::endl;
         delete[] upV; 
         delete[] A; 
         delete[] b; 
     };
 
-
-    V[0] = V[M] = 0; upV[0] = upV[M] = 0;
-
     for (int n = 0; n < N; n++)
     {
+        t = (n != N ? T_a + n * tau : T_b);
         lambda = FindLambda (H, mui, M);
 
-        InitV (A, b, V, H, f, tau, h, mui, lambda, M, n, p);
-        if (!SolveSystem (A, b, upV + 1, M - 1)) something_went_wrong ();
-    
-        InitH (A, b, V, upV, H, f0, tau, h, M, n);
-        if (!SolveSystem (A, b, H, M + 1)) something_went_wrong ();
-
-        memcpy (V, upV, (M + 1) * sizeof (double));
-        for (int i = 0; i <= M; i++)
-        {
-            u[i] = U((n+1)*tau, i*h);
-            rho[i] = po((n+1)*tau, i*h);
-            NullVector[i] = 0;
-        }
-        double w_norm = W_norm(V, u, M, h);
-        double l_norm = L_norm(V, u, M, h);
-        double c_norm = C_norm(V, u, M);
-        double V_w_norm = W_norm(V, NullVector, M, h);
-        double V_l_norm = L_norm(V, NullVector, M, h);
-        double V_c_norm = C_norm(V, NullVector, M);
-        double H_w_norm = W_norm(H, NullVector, M, h);
-        double H_l_norm = L_norm(H, NullVector, M, h);
-        double H_c_norm = C_norm(H, NullVector, M);
-        printf ("ResV1 = %e ResV2 = %e ResV3 = %e \n", c_norm / V_c_norm, l_norm / V_l_norm, w_norm / V_w_norm);
-
-        w_norm = W_norm(H, rho, M, h);
-        l_norm = L_norm(H, rho, M, h);
-        c_norm = C_norm(H, rho, M);
-
-        printf ("ResH1 = %e ResH2 = %e ResH3 = %e \n", c_norm / H_c_norm, l_norm / H_l_norm, w_norm / H_w_norm);
+        InitV (A, b, V, H, tau, h, mui, lambda, M, X_a, X_b, t, p);
+        if (!SolveSystem (A, b, upV + 1, M - 1)) something_went_wrong (n);
         
+        InitH (A, b, V, upV, H, tau, h, M, X_a, X_b, t);
+        if (!SolveSystem (A, b, H, M + 1)) something_went_wrong (n);
+              
+        memcpy (V, upV, (M + 1) * sizeof (double));
     }
 
     delete[] upV; 

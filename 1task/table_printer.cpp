@@ -22,13 +22,13 @@ void TestScheme ()
     for (int lin = 1; lin >= 0; lin--)
     {
         liniar = (bool) lin;
-        double mu = 0.1;
-        for (int mu_count = 0; mu_count < 3; mu_count++, mu *= 0.1) 
-        {
-            mui = mu;
-            for (int Cp_count = 0; Cp_count < 3; Cp_count++) 
-            {
-                Cp = pow (10, Cp_count);
+        for (int Cp_count = 0; Cp_count < 3; Cp_count++) 
+        {                
+            Cp = pow (10, Cp_count);
+            double mu = 0.1;
+            for (int mu_count = 0; mu_count < 3; mu_count++, mu *= 0.1) 
+            {  
+                mui = mu;
                 double res[4*4][4]; 
                 if (liniar) { printf("\n\\begin{tabular}{ |l|l|l|l|l| }\n\\hline\n\\multicolumn{5}{|c|}{$\\mu = %g, p(\\rho)  =  %d \\rho$} \\\\\n\\hline\n$\\tau\\setminus h$ & $0.1$ & $0.01$ & $0.001$ & $0.0001$\\\\\n\\hline\n", mui, Cp); }
                 else {printf("\n\\begin{tabular}{ |l|l|l|l|l| }\n\\hline\n\\multicolumn{5}{|c|}{$\\mu = %g, p(\\rho)  =  \\rho ^ {1.4}$} \\\\\n\\hline\n$\\tau\\setminus h$ & $0.1$ & $0.01$ & $0.001$ & $0.0001$\\\\\n\\hline\n", mui); }
@@ -79,6 +79,7 @@ void TestScheme ()
                 }
                 printf("\\end{tabular}\n\n");
             }
+            if (!liniar) { break; }
         }
     }
 

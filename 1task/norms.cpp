@@ -39,5 +39,5 @@ double W_norm (double* x, double* y, int M, double h)
         double dv_dx = ((x[i + 1] - y[i + 1]) - (x[i] - y[i])) / h;
         sum1 += dv_dx * dv_dx;
     }
-    return sqrt (norm * sum1);
+    return sqrt (h * (norm + sum1));
 }

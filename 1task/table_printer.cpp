@@ -19,10 +19,10 @@ void TestScheme ()
     double* NullVector = new double [MaxM + 1]; 
 
     std::fill(NullVector, NullVector + MaxM + 1, 0.0);
-    double mu = 0.1;
     for (int lin = 1; lin >= 0; lin--)
     {
         liniar = (bool) lin;
+        double mu = 0.1;
         for (int mu_count = 0; mu_count < 3; mu_count++, mu *= 0.1) 
         {
             mui = mu;

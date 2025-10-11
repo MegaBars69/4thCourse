@@ -20,6 +20,7 @@ double L_norm (double* x, double* y, int M, double h)
     {
         norm += (x[i] - y[i]) * (x[i] - y[i]);
     }
+    norm += 0.5 * ((x[0] - y[0]) * (x[0] - y[0]) + (x[M] - y[M]) * (x[M] - y[M]));
     return sqrt (h * norm);
 }
 
@@ -30,6 +31,13 @@ double W_norm (double* x, double* y, int M, double h)
     {
         norm += (x[i] - y[i]) * (x[i] - y[i]);
     }
-    norm+=0.5 * ((x[0] - y[0]) * (x[0] - y[0]) + (x[M] - y[M]) * (x[M] - y[M]));
-    return sqrt (h * norm);
+    norm += 0.5 * ((x[0] - y[0]) * (x[0] - y[0]) + (x[M] - y[M]) * (x[M] - y[M]));
+    
+    double sum1 = 0;
+    for (int i = 0; i < M; ++i)
+    {
+        double dv_dx = ((x[i + 1] - y[i + 1]) - (x[i] - y[i])) / h;
+        sum1 += dv_dx * dv_dx;
+    }
+    return sqrt (norm * sum1);
 }

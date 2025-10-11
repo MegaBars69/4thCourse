@@ -2,9 +2,9 @@
 #include <iostream>
 #include <cmath>
 
-double Cp = 10;
+int Cp = 1;
 double Gamma = 1.4;
-double mui = 0.01;
+double mui = 0.1;
 bool liniar = true;
 
 double p (double x) { return (liniar ? Cp * x : pow (x, Gamma)); }

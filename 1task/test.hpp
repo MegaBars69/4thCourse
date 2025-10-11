@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-extern double Cp;
+extern int Cp;
 extern double mui;
 extern bool liniar;  // Add this line
 

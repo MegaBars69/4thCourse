@@ -2,16 +2,18 @@
 #include "test.hpp"
 #include "algorithm.hpp"
 #include "progonka_solver.hpp"
+#include "table_printer.hpp"
 #include "log.hpp"
 #include "norms.hpp"
 #include <string.h>
 #include <cmath>
 #include <fenv.h>
 
-int main(int argc, char* argv[])
+int main(/*int argc, char* argv[]*/)
 {
-    //feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW);
-    double T_a = 0, T_b = 1, X_a = 0, X_b = 1;
+    
+    TestScheme ();
+    /*double T_a = 0, T_b = 1, X_a = 0, X_b = 1;
     int N, M;
     if (!init_args (argc, argv, N, M)) return 1;
 
@@ -54,7 +56,7 @@ int main(int argc, char* argv[])
     delete[] H;
     delete[] u;
     delete[] rho;
-    delete[] NullVector;
+    delete[] NullVector;*/
 
     return 0;
 }

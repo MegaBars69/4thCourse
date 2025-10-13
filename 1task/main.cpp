@@ -11,8 +11,8 @@
 
 int main(/*int argc, char* argv[]*/)
 {
-    
-    TestScheme ();
+    TestSchemeIncludedNetworks ();
+
     /*double T_a = 0, T_b = 1, X_a = 0, X_b = 1;
     int N, M;
     if (!init_args (argc, argv, N, M)) return 1;

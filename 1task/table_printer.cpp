@@ -91,3 +91,89 @@ void TestScheme ()
     delete[] rho;
     delete[] NullVector;
 }
+
+void TestSchemeIncludedNetworks ()
+{
+    double T_a = 0, T_b = 1, X_a = 0, X_b = 1;
+    int MaxN = 100000, MaxM = 100000;
+    double *f = new double[(MaxN + 1) * (MaxM + 1)];
+    double *f0 = new double[(MaxN + 1) * (MaxM + 1)];
+    double* V = new double [MaxM + 1];
+    double* V_k = new double [MaxM + 1];
+    double* H_k = new double [MaxM + 1];
+    double* H = new double [MaxM + 1];
+    double* u = new double [MaxM + 1]; 
+    double* rho = new double [MaxM + 1];
+    double* NullVector = new double [MaxM + 1]; 
+
+    std::fill(NullVector, NullVector + MaxM + 1, 0.0);
+
+    double res[3*3][3]; 
+ 
+    if (liniar) { printf("\n\\begin{tabular}{ |l|l|l|l|l| }\n\\hline\n\\multicolumn{4}{|c|}{$\\mu = %g, p(\\rho)  =  %d \\rho$} \\\\\n\\hline\n$\\tau\\setminus h$ & $0.1$ & $0.01$ & $0.001$ \\\\\n\\hline\n", mui, Cp); }
+    else {printf("\n\\begin{tabular}{ |l|l|l|l|l| }\n\\hline\n\\multicolumn{4}{|c|}{$\\mu = %g, p(\\rho)  =  \\rho ^ {1.4}$} \\\\\n\\hline\n$\\tau\\setminus h$ & $0.1$ & $0.01$ & $0.001$ \\\\\n\\hline\n", mui); }
+
+    for (int row = 0; row <= 2; row++) 
+    {
+        for (int col = 0; col < 3; col++) 
+        {
+            int N = pow (10, col + 1), M = pow (10, col + 1);
+            double h = (X_b - X_a) / M;
+            int two_in_power = pow (2, row + 1);
+            for (int i = 0; i <= M; i++)
+            {
+                u[i] = U(T_b , X_a + i*h);
+            }
+            SolveScheme (mui, T_a, T_b, X_a, X_b, N, M, V, H);
+            
+            if (row != 2)
+            {
+                SolveScheme (mui, T_a, T_b, X_a, X_b, N * two_in_power, M * two_in_power, V_k, H_k);
+                for (int i = 0; i <= M; i++)
+                {
+                    V_k [i] = V_k [i * two_in_power];
+                }
+            }
+            else 
+            {
+                for (int i = 0; i <= M; i++)
+                {
+                    V_k[i] = U(T_b , X_a + i*h);
+                }
+            }
+
+            double w_norm = W_norm(V, V_k, M, h);
+            double l_norm = L_norm(V, V_k, M, h);
+            double c_norm = C_norm(V, V_k, M);
+            double V_w_norm = W_norm(V, NullVector, M, h);
+            double V_l_norm = L_norm(V, NullVector, M, h);
+            double V_c_norm = C_norm(V, NullVector, M);
+            res[row * 3 + col][0] = c_norm / V_c_norm;
+            res[row * 3 + col][1] = l_norm / V_l_norm;
+            res[row * 3 + col][2] = w_norm / V_w_norm;
+        }
+        
+        if (row != 2) { printf("$v - v^{%d}$ ", row + 1); }
+        else { printf("$v - u$"); }
+        for (int cur_val = 0; cur_val < 3; cur_val++)
+        {
+            for (int cur_col = 0; cur_col < 3; cur_col++)
+            {
+                
+                printf ("& $%e$ ", res[row * 3 + cur_col][cur_val]);
+            }
+                printf("\\\\\n");
+        }
+        printf("\\hline\n");           
+    }
+    printf("\\end{tabular}\n\n");
+    
+
+    delete[] f;
+    delete[] f0;
+    delete[] V;
+    delete[] H;
+    delete[] u;
+    delete[] rho;
+    delete[] NullVector;
+}

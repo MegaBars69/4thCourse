@@ -2,10 +2,10 @@
 #include <iostream>
 #include <cmath>
 
-int Cp = 1;
+int Cp = 10;
 double Gamma = 1.4;
 double mui = 0.1;
-bool liniar = true;
+bool liniar = false;
 
 double p (double x) { return (liniar ? Cp * x : pow (x, Gamma)); }
 
@@ -33,4 +33,9 @@ double func_f (double t, double x)
 
     if (liniar) { return ut + u * ux + Cp * Pxp - mui * uxx / p; }
     else { return ut + u * ux + Gamma * Pxp * pow (p, 0.4) - mui * uxx / p; } 
+}
+
+double po_unsmooth (double /*t*/, double x)
+{
+    return (x > 5.5 || x < 4.5 ? 1 : 2);
 }

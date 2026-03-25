@@ -48,9 +48,11 @@ public:
       HV2 = H*V2;
   }
 
-    func_point()
-    {
-    }
+    func_point() :
+        i(0), j(0), global_num(-1),
+        G(0.0), V1(0.0), V2(0.0), H(0.0),
+        GV1(0.0), GV2(0.0), HV1(0.0), HV2(0.0)
+    {}
 
     void update_G (double new_G)
     {

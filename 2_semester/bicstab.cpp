@@ -1,6 +1,7 @@
 #include "bicstab.h"
 #include <iostream>
 
+// Constructor: extract diagonal from column‑major storage
 BiCGSTABSolver::BiCGSTABSolver(const Eigen::SparseMatrix<double>& matrix)
     : n(matrix.rows())
     , outerStarts(matrix.outerIndexPtr())
@@ -8,29 +9,30 @@ BiCGSTABSolver::BiCGSTABSolver(const Eigen::SparseMatrix<double>& matrix)
     , values(matrix.valuePtr())
     , diag(n)
 {
-    // Извлечение диагонали (предполагается, что диагональные элементы присутствуют)
-    for (int i = 0; i < n; ++i) {
-        diag[i] = 0.0;
-        for (int j = outerStarts[i]; j < outerStarts[i+1]; ++j) {
-            if (innerIndices[j] == i) {
-                diag[i] = values[j];
-                break;
+    // Find diagonal elements (the matrix is stored column‑wise)
+    for (int i = 0; i < n; ++i) diag[i] = 0.0;
+    for (int j = 0; j < n; ++j) {
+        for (int idx = outerStarts[j]; idx < outerStarts[j+1]; ++idx) {
+            int i = innerIndices[idx];
+            if (i == j) {
+                diag[i] = values[idx];
+                break; // diagonal appears at most once per column
             }
         }
-        // Если диагональ отсутствует (редко), считаем её равной 1 (защита)
-        if (diag[i] == 0.0) diag[i] = 1.0;
     }
+    // Fallback for missing diagonal (rare)
+    for (int i = 0; i < n; ++i) if (diag[i] == 0.0) diag[i] = 1.0;
 }
 
+// Matrix‑vector product y = A * x using column‑major storage
 void BiCGSTABSolver::matvec(const Vector& x, Vector& y) const
 {
     y.setZero();
-    for (int i = 0; i < n; ++i) {
-        double sum = 0.0;
-        for (int j = outerStarts[i]; j < outerStarts[i+1]; ++j) {
-            sum += values[j] * x[innerIndices[j]];
+    for (int j = 0; j < n; ++j) {
+        for (int idx = outerStarts[j]; idx < outerStarts[j+1]; ++idx) {
+            int i = innerIndices[idx];
+            y[i] += values[idx] * x[j];
         }
-        y[i] = sum;
     }
 }
 

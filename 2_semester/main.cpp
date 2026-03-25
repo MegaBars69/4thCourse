@@ -40,6 +40,7 @@ int main(int argc, char const *argv[])
 //     mesh.print_mesh();
 
 //    matrix.step = 1;
+    clock_t start1 = clock();
     for (int step = 1; step <= T_steps; step ++)
     {
         matrix.step = step;
@@ -66,6 +67,10 @@ int main(int argc, char const *argv[])
 
     }
     printf("\n");
+    clock_t end1 = clock();
+    
+    auto t1 = static_cast<double>(end1 - start1) / CLOCKS_PER_SEC;
+    std::cout<<"Time: "<<t1<<"\n";
 
 
 

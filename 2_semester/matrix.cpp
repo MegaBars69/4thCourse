@@ -30,12 +30,12 @@ func_point Matrix::init_func_point (Point point)
 
 }
 
-func_point Matrix::get_func_point_check (Point point, int dir)
+func_point Matrix::get_func_point_check(Point point, int dir)
 {
   int global_num = mesh.get_point_neigb_glob_num(point, dir);
-  if (global_num >=0 && global_num < Dim)
+  if (global_num >= 0 && global_num < Dim)
       return func_points[global_num];
-  return func_point ();
+  return func_point();   
 }
 
 void Matrix::fill_matrix_G(Point point, std::vector<eigen_triplet_t> & triplets, eigen_vector_t & rhs)
@@ -287,6 +287,7 @@ void Matrix::init_matrices_V(std::vector<eigen_triplet_t> & triplets1, eigen_vec
     }
 }
 
+/*
 int Matrix::init_and_solve_G()
 {
     eigen_matrix_t matrix (Dim, Dim);
@@ -319,6 +320,7 @@ int Matrix::init_and_solve_G()
     update_func_points(g);
     return 0;
 }
+
 
 int Matrix::init_and_solve_V ()
 {
@@ -369,8 +371,8 @@ int Matrix::init_and_solve_V ()
     update_func_points(v2);
     return 0;
 }
+*/
 
-/*
 int Matrix::init_and_solve_G()
 {
     eigen_matrix_t matrix(Dim, Dim);
@@ -386,7 +388,7 @@ int Matrix::init_and_solve_G()
 
     BiCGSTABSolver solver(matrix);
     eigen_vector_t res = guess;   // начальное приближение
-    bool converged = solver.solve(res, rhs, 1000, 1e-10);
+    bool converged = solver.solve(res, rhs, 10000, 1e-6);
     if (!converged) {
         std::cerr << "BiCGSTAB не сошёлся для G на шаге " << step << std::endl;
         return -1;
@@ -398,6 +400,7 @@ int Matrix::init_and_solve_G()
     update_func_points(g);
     return 0;
 }
+
 
 int Matrix::init_and_solve_V()
 {
@@ -424,7 +427,7 @@ int Matrix::init_and_solve_V()
     // Решение для V1
     BiCGSTABSolver solver1(matrix1);
     eigen_vector_t res1 = guess1;
-    bool conv1 = solver1.solve(res1, rhs1, 1000, 1e-10);
+    bool conv1 = solver1.solve(res1, rhs1, 10000, 1e-6);
     if (!conv1) {
         std::cerr << "BiCGSTAB не сошёлся для V1 на шаге " << step << std::endl;
         return -1;
@@ -433,7 +436,7 @@ int Matrix::init_and_solve_V()
     // Решение для V2
     BiCGSTABSolver solver2(matrix2);
     eigen_vector_t res2 = guess2;
-    bool conv2 = solver2.solve(res2, rhs2, 1000, 1e-10);
+    bool conv2 = solver2.solve(res2, rhs2, 10000, 1e-6);
     if (!conv2) {
         std::cerr << "BiCGSTAB не сошёлся для V2 на шаге " << step << std::endl;
         return -1;
@@ -448,7 +451,7 @@ int Matrix::init_and_solve_V()
     update_func_points(v2);
     return 0;
 }
-*/
+
 
 void Matrix::update_func_points(int mode)
 {

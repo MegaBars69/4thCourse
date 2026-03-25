@@ -41,3 +41,4 @@ double W_norm (double* x, double* y, int M, double h)
     }
     return sqrt (h * (norm + sum1));
 }
+

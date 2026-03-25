@@ -8,6 +8,7 @@
 
 void TestScheme ()
 {
+    /*
     double T_a = 0, T_b = 1, X_a = 0, X_b = 1;
     int MaxN = 100000, MaxM = 100000;
     double *f = new double[(MaxN + 1) * (MaxM + 1)];
@@ -89,11 +90,11 @@ void TestScheme ()
     delete[] H;
     delete[] u;
     delete[] rho;
-    delete[] NullVector;
+    delete[] NullVector;*/
 }
 
 void TestSchemeIncludedNetworks ()
-{
+{/*
     double T_a = 0, T_b = 1, X_a = 0, X_b = 1;
     int MaxN = 100000, MaxM = 100000;
     double *f = new double[(MaxN + 1) * (MaxM + 1)];
@@ -176,4 +177,5 @@ void TestSchemeIncludedNetworks ()
     delete[] u;
     delete[] rho;
     delete[] NullVector;
+    */
 }

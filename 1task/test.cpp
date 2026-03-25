@@ -5,10 +5,11 @@
 int Cp = 10;
 double Gamma = 1.4;
 double mui = 0.1;
-bool liniar = false;
+bool liniar = true;
+int num_of_func = 2;
 
 double p (double x) { return (liniar ? Cp * x : pow (x, Gamma)); }
-
+/*
 double U (double t, double x) {return cos (2 * M_PI * t) * sin (4 * M_PI * x);}
 
 double po (double t, double x) {return exp (t) * (cos (3 * M_PI * x) + 1.5);}
@@ -33,9 +34,34 @@ double func_f (double t, double x)
 
     if (liniar) { return ut + u * ux + Cp * Pxp - mui * uxx / p; }
     else { return ut + u * ux + Gamma * Pxp * pow (p, 0.4) - mui * uxx / p; } 
-}
+}*/
 
-double po_unsmooth (double /*t*/, double x)
+double po1(double x)
 {
     return (x > 5.5 || x < 4.5 ? 1 : 2);
+}
+
+double U1( double /*x*/)
+{
+    return 0;
+}
+
+double po2 (double /*x*/)
+{
+    return 1;
+}
+
+double U2 (double x)
+{
+    return (x > 5.5 || x < 4.5 ? 0 : 1);
+}
+
+double U (double x)
+{
+    return (num_of_func == 1 ? U1 (x) : U2 (x));
+}
+
+double po (double x)
+{
+    return (num_of_func == 1 ? po1 (x) : po2 (x));
 }

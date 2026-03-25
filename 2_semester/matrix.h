@@ -15,7 +15,7 @@ using eigen_matrix_t = Eigen::SparseMatrix<double>;
 using eigen_triplet_t = Eigen::Triplet<double>;
 using eigen_vector_t = Eigen::VectorXd;
 //using eigen_precond_t = Eigen::LeastSquareDiagonalPreconditioner<double>;
-using eigen_solver_t = Eigen::ConjugateGradient<eigen_matrix_t>;
+using eigen_solver_t = Eigen::BiCGSTAB<eigen_matrix_t>;
 
 class func_point
 {
@@ -109,8 +109,8 @@ public:
   void fill_matrix_V1 (Point point, std::vector<eigen_triplet_t> & triplets, eigen_vector_t & rhs);
   void fill_matrix_V2 (Point point, std::vector<eigen_triplet_t> & triplets, eigen_vector_t & rhs);
 
-  void init_and_solve_G();
-  void init_and_solve_V();
+  int init_and_solve_G();
+  int init_and_solve_V();
 
   void update_func_points (int mode);
 

@@ -289,6 +289,90 @@ void Matrix::init_matrices_V(std::vector<eigen_triplet_t> & triplets1, eigen_vec
 
 int Matrix::init_and_solve_G()
 {
+    eigen_matrix_t matrix (Dim, Dim);
+    std::vector<eigen_triplet_t> triplets;
+    eigen_vector_t rhs (Dim);
+    eigen_vector_t guess (Dim);
+
+    for (int i = 0; i < Dim; i++)
+        guess[i] = func_points[i].G;
+
+    init_matrix_G(triplets, rhs);
+    matrix.setFromTriplets(triplets.begin(), triplets.end());
+
+    eigen_solver_t solver;
+    solver.compute(matrix);
+    eigen_vector_t res = solver.solveWithGuess(rhs, guess);
+
+    for (int i = 0; i < Dim; i++)
+      solution_G[i] = res[i];
+
+//    if (step % 6 == 0)
+//    {
+//        for (int i = 0; i < Dim; i++)
+//        {
+//            auto point = mesh.mesh_points[i];
+//            solution_G[i] = log(rho(step*mesh.tau, point.x, point.y ));
+//        }
+//    }
+
+    update_func_points(g);
+    return 0;
+}
+
+int Matrix::init_and_solve_V ()
+{
+    eigen_matrix_t matrix1 (Dim, Dim);
+    std::vector<eigen_triplet_t> triplets1;
+    eigen_vector_t rhs1 (Dim);
+
+    eigen_matrix_t matrix2 (Dim, Dim);
+    std::vector<eigen_triplet_t> triplets2;
+    eigen_vector_t rhs2 (Dim);
+
+    eigen_vector_t guess1 (Dim);
+    eigen_vector_t guess2 (Dim);
+
+    for (int i = 0; i < Dim; i++)
+    {
+        guess1[i] = func_points[i].V1;
+        guess2[i] = func_points[i].V2;
+    }
+
+    init_matrices_V(triplets1, rhs1, triplets2, rhs2 );
+    matrix1.setFromTriplets(triplets1.begin(), triplets1.end());
+    matrix2.setFromTriplets(triplets2.begin(), triplets2.end());
+
+    eigen_solver_t solver;
+    solver.compute(matrix1);
+    eigen_vector_t res1 = solver.solveWithGuess(rhs1, guess1);
+
+    solver.compute(matrix2);
+    eigen_vector_t res2 = solver.solveWithGuess(rhs2, guess2);
+
+    for (int i = 0; i < Dim; i++)
+    {
+        solution_V1[i] = res1[i];
+        solution_V2[i] = res2[i];
+    }
+
+//    if (step % 6 == 0)
+//    {
+//        for (int i = 0; i < Dim; i++) {
+//            Point point = mesh.mesh_points[i];
+//            solution_V1[i] = u1(step * mesh.tau, point.x, point.y);
+//            solution_V2[i] = u2(step * mesh.tau, point.x, point.y);
+//        }
+//    }
+
+    update_func_points(v1);
+    update_func_points(v2);
+    return 0;
+}
+
+/*
+int Matrix::init_and_solve_G()
+{
     eigen_matrix_t matrix(Dim, Dim);
     std::vector<eigen_triplet_t> triplets;
     eigen_vector_t rhs(Dim);
@@ -364,6 +448,7 @@ int Matrix::init_and_solve_V()
     update_func_points(v2);
     return 0;
 }
+*/
 
 void Matrix::update_func_points(int mode)
 {

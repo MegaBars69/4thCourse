@@ -5,6 +5,7 @@
 #include "mesh.h"
 #include <vector>
 #include "funcs.h"
+#include "thread_pool.h"
 #include "Eigen/Sparse"
 
 #define g 1
@@ -16,6 +17,12 @@ using eigen_triplet_t = Eigen::Triplet<double>;
 using eigen_vector_t = Eigen::VectorXd;
 //using eigen_precond_t = Eigen::LeastSquareDiagonalPreconditioner<double>;
 using eigen_solver_t = Eigen::BiCGSTAB<eigen_matrix_t>;
+
+enum class solver_type
+{
+  library,
+  own,
+};
 
 class func_point
 {
@@ -85,6 +92,7 @@ public:
 
   P_gas gas;
   Mesh mesh;
+  solver_type solver;
 
   int Dim;
   int step = 0;
@@ -98,6 +106,8 @@ public:
   std::vector<double> solution_G;
   std::vector<double> solution_V1;
   std::vector<double> solution_V2;
+
+  ThreadPool pool;
 
   func_point get_func_point_check (Point point, int dir);
   func_point init_func_point (Point point);
@@ -114,15 +124,17 @@ public:
   int init_and_solve_G();
   int init_and_solve_V();
 
+  double solve_scheme ();
+
   void update_func_points (int mode);
 
-  double calc_res_C1 (int mode);
-  double calc_res_L2 (int mode);
-  double calc_res_W1 (int mode);
+  double calc_res_C1 (int mode, std::vector<double> other_res = {});
+  double calc_res_L2 (int mode, std::vector<double> other_res = {});
+  double calc_res_W1 (int mode, std::vector<double> other_res = {});
 
 public:
-    Matrix (P_gas gas,  Mesh mesh) :
-    gas(gas), mesh (mesh)
+    Matrix (P_gas gas,  Mesh mesh, solver_type solver = solver_type::own) :
+    gas(gas), mesh (mesh), solver (solver)
     {
       Dim = mesh.Dim;
 

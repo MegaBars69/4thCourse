@@ -1,5 +1,6 @@
 #include <iostream>
 #include "matrix.h"
+#include "table_tex_printer.h"
 
 int main(int argc, char const *argv[])
 {
@@ -12,6 +13,13 @@ int main(int argc, char const *argv[])
   int Y_segm;
   int T_steps;
   int mode;
+  if (argc == 2)
+  {
+    nested_grid_test ();
+    return 0;
+  }
+
+  
   if (argc != 10 )
   {
       printf ("NULL\n");

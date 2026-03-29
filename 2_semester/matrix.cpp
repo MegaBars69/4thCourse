@@ -379,6 +379,7 @@ int Matrix::init_and_solve_G()
     std::vector<eigen_triplet_t> triplets;
     eigen_vector_t rhs(Dim);
     eigen_vector_t guess(Dim);
+    eigen_vector_t res;   
 
     for (int i = 0; i < Dim; i++)
         guess[i] = func_points[i].G;
@@ -386,12 +387,26 @@ int Matrix::init_and_solve_G()
     init_matrix_G(triplets, rhs);
     matrix.setFromTriplets(triplets.begin(), triplets.end());
 
-    BiCGSTABSolver solver(matrix);
-    eigen_vector_t res = guess;   // начальное приближение
-    bool converged = solver.solve(res, rhs, 10000, 1e-6);
-    if (!converged) {
-        std::cerr << "BiCGSTAB не сошёлся для G на шаге " << step << std::endl;
-        return -1;
+    if (solver == solver_type::own)
+    {
+        BiCGSTABSolver solver(matrix);
+        res = guess;                   
+        bool converged = solver.solve(res, rhs, 10000, 1e-5);
+        if (!converged) {
+            std::cerr << "BiCGSTAB не сошёлся для G на шаге " << step << std::endl;
+            return -1;
+        }
+    }
+    else
+    {
+        eigen_solver_t solver;
+        solver.compute(matrix);
+        res = solver.solveWithGuess(rhs, guess);  
+        if (solver.info() != Eigen::Success)
+        {
+            std::cerr << "Lib::BiCGSTAB не сошёлся для G на шаге " << step << std::endl;
+            return -1;
+        }
     }
 
     for (int i = 0; i < Dim; i++)
@@ -414,6 +429,9 @@ int Matrix::init_and_solve_V()
 
     eigen_vector_t guess1(Dim);
     eigen_vector_t guess2(Dim);
+    eigen_vector_t res1;
+    eigen_vector_t res2;
+
 
     for (int i = 0; i < Dim; i++) {
         guess1[i] = func_points[i].V1;
@@ -424,24 +442,45 @@ int Matrix::init_and_solve_V()
     matrix1.setFromTriplets(triplets1.begin(), triplets1.end());
     matrix2.setFromTriplets(triplets2.begin(), triplets2.end());
 
-    // Решение для V1
-    BiCGSTABSolver solver1(matrix1);
-    eigen_vector_t res1 = guess1;
-    bool conv1 = solver1.solve(res1, rhs1, 10000, 1e-6);
-    if (!conv1) {
-        std::cerr << "BiCGSTAB не сошёлся для V1 на шаге " << step << std::endl;
-        return -1;
-    }
+    if (solver == solver_type::own)
+    {
+      // Решение для V1
+      BiCGSTABSolver solver1(matrix1);
+      res1 = guess1;
+      bool conv1 = solver1.solve(res1, rhs1, 10000, 1e-5);
+      if (!conv1) {
+          std::cerr << "BiCGSTAB не сошёлся для V1 на шаге " << step << std::endl;
+          return -1;
+      }
 
-    // Решение для V2
-    BiCGSTABSolver solver2(matrix2);
-    eigen_vector_t res2 = guess2;
-    bool conv2 = solver2.solve(res2, rhs2, 10000, 1e-6);
-    if (!conv2) {
-        std::cerr << "BiCGSTAB не сошёлся для V2 на шаге " << step << std::endl;
-        return -1;
+      // Решение для V2
+      BiCGSTABSolver solver2(matrix2);
+      res2 = guess2;
+      bool conv2 = solver2.solve(res2, rhs2, 10000, 1e-5);
+      if (!conv2) {
+          std::cerr << "BiCGSTAB не сошёлся для V2 на шаге " << step << std::endl;
+          return -1;
+      }
     }
+    else
+    {
+      eigen_solver_t solver;
+      solver.compute(matrix1);
+      res1 = solver.solveWithGuess(rhs1, guess1);
+      if (solver.info() != Eigen::Success)
+      {
+        std::cerr << "Lib:BiCGSTAB не сошёлся для V1 на шаге " << step << std::endl;
+        return -1;
+      }
 
+      solver.compute(matrix2);
+      res2 = solver.solveWithGuess(rhs2, guess2);
+      if (solver.info() != Eigen::Success)
+      {
+        std::cerr << "Lib:BiCGSTAB не сошёлся для V2 на шаге " << step << std::endl;
+        return -1;
+      }
+    }
     for (int i = 0; i < Dim; i++) {
         solution_V1[i] = res1[i];
         solution_V2[i] = res2[i];
@@ -466,4 +505,21 @@ void Matrix::update_func_points(int mode)
         if (mode == v2)
           func_points[i].update_V2(solution_V2[i]);
     }
+}
+
+double Matrix::solve_scheme ()
+{
+  clock_t start1 = clock();
+  auto T_steps = mesh.T_segm;
+  for (int t = 1; t <= T_steps; t ++)
+  {
+      step = t;
+      if (init_and_solve_G() == -1) return -1;
+      if (init_and_solve_V() == -1) return -1;
+
+  }
+  clock_t end1 = clock();
+  
+  auto t1 = static_cast<double>(end1 - start1) / CLOCKS_PER_SEC;
+  return t1;
 }

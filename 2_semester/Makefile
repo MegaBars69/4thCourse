@@ -4,7 +4,7 @@ CXXFLAGS = -std=c++17 -Wall -Wextra -O3 -g
 INCLUDES = -I/usr/include/eigen3 -I.
 
 # Source files
-SRCS = main.cpp matrix.cpp mesh.cpp funcs.cpp P_gas.cpp P_scheme.cpp residuals.cpp table_tex_printer.cpp bicstab.cpp
+SRCS = main.cpp matrix.cpp mesh.cpp funcs.cpp P_gas.cpp P_scheme.cpp residuals.cpp bicstab.cpp table_tex_printer.cpp task3.cpp
 OBJS = $(SRCS:.cpp=.o)
 TARGET = solver
 

@@ -2,7 +2,20 @@
 #include <vector>
 #include <cstdio>
 
-enum class block_status {inner, x1c_r, x1c_l, x2c_u, x2c_d, corner_l2u, corner_u2r, corner_r2d, corner_d2l, corner_l2d, outer, error};
+enum class block_status {
+    inner,
+    x1c_r,      // левая граница (область справа)
+    x1c_l,      // правая граница
+    x2c_u,      // нижняя граница
+    x2c_d,      // верхняя граница
+    corner_l2u, corner_u2r, corner_r2d, corner_d2l, corner_l2d,
+    inlet_left,     // вход на левой границе (u1 = w, ρ задана)
+    outlet_bottom,  // выход на нижней границе (∂u2/∂y = 0, u1 = 0)
+    outlet_top,     // выход на верхней границе (∂u2/∂y = 0, u1 = 0)
+    outer,
+    error
+};
+
 #define m_00 0
 #define m_R0 1
 #define m_L0 2
@@ -23,53 +36,42 @@ enum class block_status {inner, x1c_r, x1c_l, x2c_u, x2c_d, corner_l2u, corner_u
 
 class Point
 {
-  public :
+public:
     double x{}, y{};
-    int i{},j{};
+    int i{}, j{};
     block_status status;
 
-  Point (double x, double y, int i, int j, block_status status) :
-    x(x), y(y), i(i), j(j), status(status)
-  {}
-
-  Point ()
-  {}
+    Point(double x, double y, int i, int j, block_status status) :
+        x(x), y(y), i(i), j(j), status(status) {}
+    Point() {}
 };
-
-void fill_mesh_blocks_vector (std::vector<Point> & mesh_points, int N, int M, double X, double Y);
 
 class Mesh
 {
-public :
-  double X{}, Y{}, T {};
-  int N {}, M {}, Dim{};
-  int T_segm;
+public:
+    double X{}, Y{}, T{};
+    int N{}, M{}, Dim{};
+    int T_segm;
+    std::vector<Point> mesh_points{};
+    double h_x, h_y, tau;
 
-  std::vector<Point> mesh_points {};
-  double h_x, h_y, tau;
+    Mesh(double X, double Y, double T, int N, int M, int T_segm) :
+        X(X), Y(Y), T(T), N(N), M(M), T_segm(T_segm)
+    {
+        Dim = N * M;
+        mesh_points.resize(Dim);
+        h_x = X / (N - 1);
+        h_y = Y / (M - 1);
+        tau = T / T_segm;
+        // Заполнение сетки будет выполнено отдельно вызовом fill_mesh_domain12
+    }
 
-
-public :
-Mesh (double X, double Y, double T, int N, int M, int T_segm) :
-X(X), Y(Y), T(T), N(N), M(M), T_segm(T_segm)
-{
-  Dim = N*M;
-  mesh_points.resize (Dim);
-  h_x = X / (N - 1);
-  h_y = Y / (M - 1);
-  tau = T / (T_segm);
-  fill_mesh_blocks_vector (mesh_points, N, M, X, Y);
-}
-
-Point get_neighbour (Point point, int dir);
-Point get_point (int i, int j)
-{
-  return mesh_points[j*N + i];
-}
-
-int get_point_neigb_glob_num (Point point, int dir);
-
-
-void print_mesh();
-
+    Point get_neighbour(Point point, int dir);
+    Point get_point(int i, int j) { return mesh_points[j * N + i]; }
+    int get_point_neigb_glob_num(Point point, int dir);
+    void print_mesh();
 };
+
+void fill_mesh_domain12(std::vector<Point>& mesh_points, int N, int M,
+                        double X, double Y,
+                        double w, double rho_inlet);

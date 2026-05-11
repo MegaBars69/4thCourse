@@ -4,6 +4,7 @@
 #include <cmath>
 #include "matrix.h"
 
+/*
 // Вспомогательная функция для печати одной таблицы для заданной переменной (mode = g, v1, v2)
 void PrintTableForVariable(int var_mode,                      // g, v1 или v2
                            const std::string& var_name,       // название переменной для заголовка
@@ -11,7 +12,7 @@ void PrintTableForVariable(int var_mode,                      // g, v1 или v2
                            const std::vector<int>& N_points,
                            const std::vector<int>& T_steps_list,
                            double X, double Y, double T,
-                           double gamma)
+                           double gamma, double w, double rho_in)
 {
     int n_rows = T_steps_list.size();
     int n_cols = N_points.size();
@@ -28,14 +29,19 @@ void PrintTableForVariable(int var_mode,                      // g, v1 или v2
         for (int col = 0; col < n_cols; ++col) {
             int Nx = N_points[col];
             int Ny = N_points[col];   // квадратная сетка
-            double h = X / (Nx - 1);
+            double h = X / Nx;
 
             // Создание объектов
             P_gas gas(T, X, Y, Cp, gamma, mu, mode);
             Mesh mesh(X, Y, T, Nx, Ny, T_steps);
             Matrix matrix(gas, mesh);
+            mesh.mesh_points.clear();
+            mesh.mesh_points.resize(mesh.Dim);
+            fill_mesh_domain12(mesh.mesh_points, mesh.N, mesh.M, X, Y, w, rho_in);
 
+            Matrix matrix(gas, mesh, w, rho_in, solver_type::library);
             // Расчёт по всем временным слоям
+
             bool success = true;
             for (int step = 1; step <= T_steps; ++step) {
                 matrix.step = step;
@@ -76,7 +82,7 @@ void PrintTableForVariable(int var_mode,                      // g, v1 или v2
     std::cout << "\\hline\n";
     std::cout << "$\\tau \\setminus h$ ";
     for (int col = 0; col < n_cols; ++col) {
-        double h = X / (N_points[col] - 1);
+        double h = X / N_points[col] ;
         std::cout << " & $" << h << "$ ";
     }
     std::cout << "\\\\\n";
@@ -103,7 +109,7 @@ void PrintTableForVariable(int var_mode,                      // g, v1 или v2
     }
     std::cout << "\\end{tabular}\n\n";
 }
-
+*/
 #include <iomanip>
 #include <algorithm>
 #include "funcs.h"
@@ -112,7 +118,7 @@ void PrintNestedGridTable(double mu, double Cp, int mode,
                           const std::vector<int>& base_N,
                           const std::vector<int>& base_T,
                           double X, double Y, double T,
-                          double gamma)
+                          double gamma, double omega, double rho_in)
 {
     const double final_time = T;
     std::vector<int> factors = {2, 4, 0};   // 0 means exact
@@ -135,8 +141,11 @@ void PrintNestedGridTable(double mu, double Cp, int mode,
 
         // Coarse grid (base)
         Mesh coarse_mesh(X, Y, T, N_base, N_base, T_base);
+        coarse_mesh.mesh_points.clear();
+        coarse_mesh.mesh_points.resize(coarse_mesh.Dim);
+        fill_mesh_domain12(coarse_mesh.mesh_points, coarse_mesh.N, coarse_mesh.M, X, Y, omega, rho_in);
         P_gas coarse_gas(T, X, Y, Cp, gamma, mu, mode);
-        Matrix coarse_mat(coarse_gas, coarse_mesh);
+        Matrix coarse_mat(coarse_gas, coarse_mesh, omega, rho_in, solver_type::library);
 
         // Solve on coarse grid
         bool coarse_failed = false;
@@ -191,8 +200,11 @@ void PrintNestedGridTable(double mu, double Cp, int mode,
                 int N_fine = (N_base - 1) * factor + 1;
                 int T_fine = T_base * factor;
                 Mesh fine_mesh(X, Y, T, N_fine, N_fine, T_fine);
+                fine_mesh.mesh_points.clear();
+                fine_mesh.mesh_points.resize(fine_mesh.Dim);
+                fill_mesh_domain12(fine_mesh.mesh_points, fine_mesh.N, fine_mesh.M, X, Y, omega, rho_in);
                 P_gas fine_gas(T, X, Y, Cp, gamma, mu, mode);
-                Matrix fine_mat(fine_gas, fine_mesh);
+                Matrix fine_mat(coarse_gas, coarse_mesh, omega, rho_in, solver_type::library);
 
                 bool fine_failed = false;
                 for (int step = 1; step <= T_fine; ++step) {
@@ -270,8 +282,7 @@ void PrintNestedGridTable(double mu, double Cp, int mode,
 
         // Rows: for each factor (refinement level)
         for (int f = 0; f < n_factors; ++f) {
-            double tau = T / base_T[0];   // first base tau (all bases have same tau for this row? Actually tau changes with base. But in the table, each row corresponds to a fixed tau and the columns vary h. In our loop, we have a different tau for each base. That's inconsistent. We need to group by tau, not by base index. The original example grouped by tau values and had columns for h. So we need to restructure: we should have a list of tau values and for each tau, we have a set of h values. In the current code, base_N and base_T are paired; each base gives a pair (h, tau). So we can treat each base as a separate (h,tau) combination. That matches the previous table_tex_printer which had rows for tau and columns for h. So we can keep the structure: for each base (which gives both h and tau), we have a column. Then for each factor, we have a row. The row corresponds to a fixed factor but different tau? Actually the factors are applied to both h and tau, so for each base we get a refined grid with smaller h and tau. So in the nested grid table, we want to see convergence for each base grid (h, tau) as we refine. So the rows should be the refinement levels (v - v^1, v - v^2, v - u) and the columns are the base grids. That is exactly what we have: each column corresponds to a base grid (h,tau). So we can proceed.
-            // Print the row label
+            double tau = T / base_T[0];  
             if (f < n_factors - 1) {
                 std::cout << "$v - v^{" << (f+1) << "}$ ";
             } else {
@@ -297,8 +308,9 @@ void PrintNestedGridTable(double mu, double Cp, int mode,
 
 void RunNestedGridTests()
 {
-    double X = 1.0, Y = 1.0, T = 1.0;
+    double X = 3.0, Y = 3.0, T = 3.0;
     double gamma = 1.4;
+    double omega = 0.1, rho = 1.0;
     std::vector<double> mu_values = {0.1, 0.01};
     std::vector<double> Cp_values = {1.0, 10.0};
     std::vector<int> modes = {0, 1};
@@ -310,27 +322,28 @@ void RunNestedGridTests()
         for (double mu : mu_values) {
             if (mode == 1) {
                 for (double Cp : Cp_values) {
-                    PrintNestedGridTable(mu, Cp, mode, base_N, base_T, X, Y, T, gamma);
+                    PrintNestedGridTable(mu, Cp, mode, base_N, base_T, X, Y, T, gamma, omega, rho);
                 }
             } else {
                 double Cp_dummy = 0.0;
-                PrintNestedGridTable(mu, Cp_dummy, mode, base_N, base_T, X, Y, T, gamma);
+                PrintNestedGridTable(mu, Cp_dummy, mode, base_N, base_T, X, Y, T, gamma, omega, rho);
             }
         }
     }
 }
 
+/*
 // Основная тестовая функция
 void test_scheme() {
     const double X = 1.0, Y = 1.0, T = 1.0;
     const double gamma = 1.4;
 
-    std::vector<double> mu_values = {0.1, 0.01/*, 0.001*/};
-    std::vector<double> Cp_values = {1.0, 10.0/*, 100.0*/};
+    std::vector<double> mu_values = {0.1, 0.01};
+    std::vector<double> Cp_values = {1.0, 10.0};
     std::vector<int> modes = {0, 1};
 
-    std::vector<int> N_points = {40, 60, 120, 160};
-    std::vector<int> T_steps_list = {40, 60, 120, 160};
+    std::vector<int> N_points = {40, 80, 160, 320};
+    std::vector<int> T_steps_list = {40, 80, 160, 320};
 
     struct VarInfo { int id; std::string name; };
     std::vector<VarInfo> vars = {{g, "G"}, {v1, "V_1"}, {v2, "V_2"}};
@@ -355,7 +368,8 @@ void test_scheme() {
     }
     std::cerr << "\nAll done!\n";
 }
-
+*/
+/*
 void test_speed ()
 {
                             
@@ -433,3 +447,4 @@ void test_speed ()
     }
     std::cout << "\\end{tabular}\n\n";
 }
+    */
